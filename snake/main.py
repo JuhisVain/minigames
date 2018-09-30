@@ -1,7 +1,6 @@
 from enum import Enum
 import random
 import curses
-import os
 import _thread
 import time
 
@@ -41,11 +40,17 @@ def main():
           random.randrange(1, field_height-2) * field_width] = FRUIT
     current_fruits = 1
 
+    ramaramadingdong = [True]
+    _thread.start_new_thread(ticker, (ramaramadingdong, ))
     print_field(stdscr, field, field_width, field_height)
 
     while True:
 
         input_dir = stdscr.getch()
+
+        while ramaramadingdong[0]:
+            pass
+        ramaramadingdong[0] = True
         
         if not input_dir:
             pass
@@ -123,12 +128,19 @@ def print_field(stdscr, field, field_width, field_height):
     stdscr.refresh()
 
 
+def ticker(lock):
+    while True:
+        time.sleep(0.5)
+        lock[0] = False
+
+
+
 def init_curses():
     stdscr = curses.initscr()
     stdscr.keypad(True)
     curses.noecho()
     curses.cbreak()
-    stdscr.timeout(1000)
+    stdscr.timeout(500)
     return stdscr
 
 
