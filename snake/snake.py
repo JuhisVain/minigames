@@ -40,17 +40,17 @@ def main():
           random.randrange(1, field_height-2) * field_width] = FRUIT
     current_fruits = 1
 
-    ramaramadingdong = [True]
-    _thread.start_new_thread(ticker, (ramaramadingdong, ))
+    lock = [True]
+    _thread.start_new_thread(ticker, (lock, ))
     print_field(stdscr, field, field_width, field_height)
 
     while True:
 
         input_dir = stdscr.getch()
 
-        while ramaramadingdong[0]:
+        while lock[0]:
             pass
-        ramaramadingdong[0] = True
+        lock[0] = True
         
         if not input_dir:
             pass
@@ -92,8 +92,7 @@ def main():
             snake_length += 1
             field[landing_coord] = snake_length
         else:
-            pass
-            # print("death")
+            break  # game over
 
         if current_fruits < max_fruits and random.randrange(1, 100) < 10:
             xc = random.randrange(1, field_width-2)
@@ -109,7 +108,7 @@ def main():
     stdscr.keypad(False)
     curses.endwin()
 
-    
+
 def val_to_char(val):
     if val < 0:
         return '#'
@@ -130,9 +129,8 @@ def print_field(stdscr, field, field_width, field_height):
 
 def ticker(lock):
     while True:
-        time.sleep(0.5)
+        time.sleep(0.35)
         lock[0] = False
-
 
 
 def init_curses():
@@ -140,7 +138,7 @@ def init_curses():
     stdscr.keypad(True)
     curses.noecho()
     curses.cbreak()
-    stdscr.timeout(500)
+    stdscr.timeout(350)
     return stdscr
 
 
