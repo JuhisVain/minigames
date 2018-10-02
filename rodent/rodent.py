@@ -15,7 +15,7 @@ def main():
     field_height = 21
     border_zone = 3
 
-    mouse = [(field_width//2 + 1), (field_height//2 + 1)]
+    mouse = [(field_width//2), (field_height//2)]
     cat_list = []
     cat_list.append( [1,1] )
 
@@ -33,10 +33,40 @@ def main():
     field[mouse[0]][mouse[1]] = MOUSE
 
     _thread.start_new_thread(tick, (field, cat_list, mouse, stdscr, ))
-    
-    stdscr.getch()
 
-    
+    while True:
+        input_key = stdscr.getch()
+        move(mouse, input_key, field)
+        print_field(stdscr, field)
+
+
+def move(coord, direction, field):
+    x_mod = 0
+    y_mod = 0
+    if direction == curses.KEY_UP:
+        y_mod -= 1
+    elif direction == curses.KEY_RIGHT:
+        x_mod += 1
+    elif direction == curses.KEY_DOWN:
+        y_mod += 1
+    elif direction == curses.KEY_LEFT:
+        x_mod -= 1
+
+    if coord[0]+x_mod < 0 or coord[0]+x_mod >= len(field) or coord[1]+y_mod < 0 or coord[1]+y_mod >= len(field[0]):
+        return
+
+    # target = field[coord[0]+x_mod][coord[1]+y_mod] # Will not work, gotta have pointers
+
+    if field[coord[0]+x_mod][coord[1]+y_mod] == BLOCK:
+        move([coord[0]+x_mod, coord[1]+y_mod], direction, field)
+
+    if field[coord[0]+x_mod][coord[1]+y_mod] == EMPTY:
+        memory = field[coord[0]][coord[1]]
+        field[coord[0]][coord[1]] = EMPTY
+        coord[0] += x_mod
+        coord[1] += y_mod
+        field[coord[0]][coord[1]] = memory
+
 
 def tick(field, cat_list, mouse, stdscr):
     while True:
@@ -69,6 +99,7 @@ def print_field(stdscr, field):
     for y in range(len(field[0])):
         for x in range(len(field)):
             stdscr.addch(y, x, val_to_char(field[x][y]))
+
     stdscr.refresh()
 
 def val_to_char(value):
